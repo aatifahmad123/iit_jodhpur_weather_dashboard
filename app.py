@@ -65,5 +65,7 @@ def update_graphs(start_date, end_date):
     
     return temp_fig, rain_fig, wind_fig
 
+server = app.server
+
 if __name__ == '__main__':
     app.run(debug=False)
