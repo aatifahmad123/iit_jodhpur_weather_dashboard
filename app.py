@@ -3,8 +3,9 @@ from dash import dcc, html
 import plotly.express as px
 import pandas as pd
 import dash_bootstrap_components as dbc
+import os
 
-file_path = "Weather_Data_IIT_Jodhpur.csv"
+file_path = os.path.join(os.path.dirname(__file__), "Weather_Data_IIT_Jodhpur.csv")
 df = pd.read_csv(file_path)
 
 df['time'] = pd.to_datetime(df['time'])
