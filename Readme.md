@@ -12,8 +12,8 @@ The dashboard visualizes **temperature trends, daily rainfall, and wind speed** 
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/weather-dashboard.git
-   cd weather-dashboard
+   git clone https://github.com/aatifahmad123/iit_jodhpur_weather_dashboard
+   cd iit_jodhpur_weather_dashboard
    ```
 2. Install dependencies:
    ```bash
