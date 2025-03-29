@@ -1,7 +1,7 @@
 # IIT Jodhpur Weather Dashboard 🌤️
 
 A web-based weather dashboard for IIT Jodhpur, built using **Python Dash** and **Plotly**.  
-The dashboard visualizes **temperature trends, daily rainfall, and wind speed** for one year (March 1, 2024 – March 1, 2025).  
+The dashboard visualizes **temperature trends, daily rainfall, and wind speed** for one year (March 1, 2024 – March 1, 2025). Application live at : https://iit-jodhpur-weather-dashboard.onrender.com/
 
 ## Features
 - Interactive date selection (limited to the dataset range)
