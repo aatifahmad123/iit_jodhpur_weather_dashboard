@@ -13,32 +13,68 @@ df['time'] = pd.to_datetime(df['time'])
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "Weather Dashboard - IIT Jodhpur"
 
-app.layout = dbc.Container([
-    html.Div(style={'backgroundColor': '#f8f9fa', 'padding': '20px', 'borderRadius': '10px'}, children=[
-        html.H1("IIT Jodhpur Weather Dashboard", className='text-center mb-2', style={'font-family': 'Arial, sans-serif'}),
-        html.H5("Created by Aatif Ahmad", className='text-center text-secondary mb-2', style={'font-family': 'Arial, sans-serif'}),
-        html.P("Latitude: 26.4710° N, Longitude: 73.1134° E", className='text-center fw-bold'),
-        html.P(["Data Source: ", html.A("Open-Meteo", href="https://open-meteo.com/", target="_blank", className='text-primary')], className='text-center text-muted'),
-        html.P("Note: We are using data only from 1st March 2024 to 1st March 2025.", className='text-center text-primary fw-bold'),
-        
-        html.Div([
-            html.Label("Select Date Range:", className='fw-bold'),
-            dcc.DatePickerRange(
-                id='date-picker',
-                start_date=df['time'].min(),
-                end_date=df['time'].max(),
-                min_date_allowed=df['time'].min(),
-                max_date_allowed=df['time'].max(),
-                display_format='YYYY-MM-DD',
-                className='mb-3 d-block'
-            ),
-        ], className='mb-4 text-center'),
-        
-        html.Div([html.H4("Temperature Trends", className='text-center'), dcc.Graph(id='temp-trends')], className='mb-4 p-3 border rounded shadow-sm bg-white'),
-        html.Div([html.H4("Daily Rainfall", className='text-center'), dcc.Graph(id='rainfall-trends')], className='mb-4 p-3 border rounded shadow-sm bg-white'),
-        html.Div([html.H4("Wind Speed Trends", className='text-center'), dcc.Graph(id='wind-trends')], className='mb-4 p-3 border rounded shadow-sm bg-white'),
-    ])
-])
+app.layout = html.Div([
+    # Fixed header section
+    html.Div([
+        dbc.Container([
+            html.Div(style={
+                'backgroundColor': '#f8f9fa',
+                'padding': '8px',
+                'borderRadius': '10px',
+                'position': 'relative',
+                'zIndex': 1000   # ensures date picker calendar is on top
+            }, children=[
+                html.H2("IIT Jodhpur Weather Dashboard | Created by Aatif Ahmad",
+                        className='text-center mb-1',
+                        style={'font-family': 'Arial, sans-serif', 'fontSize': '1.3rem'}),
+                
+                html.P([
+                    "26.4710° N, 73.1134° E | Data: ",
+                    html.A("Open-Meteo", href="https://open-meteo.com/", target="_blank", className='text-primary'),
+                    " | March 2024 - March 2025"
+                ], className='text-center text-muted mb-2',
+                   style={'fontSize': '0.75rem', 'margin': '0'}),
+                
+                html.Div([
+                    html.Label("Select Date Range:", className='fw-bold',
+                               style={'fontSize': '0.85rem', 'marginRight': '10px'}),
+                    dcc.DatePickerRange(
+                        id='date-picker',
+                        start_date=df['time'].min(),
+                        end_date=df['time'].max(),
+                        min_date_allowed=df['time'].min(),
+                        max_date_allowed=df['time'].max(),
+                        display_format='YYYY-MM-DD',
+                        style={'display': 'inline-block', 'fontSize': '0.85rem'},
+                    ),
+                ], className='text-center mb-1'),
+            ]),
+        ], fluid=True, style={'padding': '10px'})
+    ], style={'height': '120px', 'overflow': 'visible'}), 
+    
+    # Dynamic graphs section - takes remaining height
+    html.Div([
+        dbc.Container([
+            html.Div([
+                html.H6("Temperature Trends", className='text-center mb-1'), 
+                dcc.Graph(id='temp-trends', style={'height': 'calc((100vh - 120px) / 3 - 60px)'})
+            ], className='mb-1 p-2 border rounded shadow-sm bg-white',
+               style={'height': 'calc((100vh - 120px) / 3)'}),
+            
+            html.Div([
+                html.H6("Daily Rainfall", className='text-center mb-1'), 
+                dcc.Graph(id='rainfall-trends', style={'height': 'calc((100vh - 120px) / 3 - 60px)'})
+            ], className='mb-1 p-2 border rounded shadow-sm bg-white',
+               style={'height': 'calc((100vh - 120px) / 3)'}),
+            
+            html.Div([
+                html.H6("Wind Speed Trends", className='text-center mb-1'), 
+                dcc.Graph(id='wind-trends', style={'height': 'calc((100vh - 120px) / 3 - 60px)'})
+            ], className='p-2 border rounded shadow-sm bg-white',
+               style={'height': 'calc((100vh - 120px) / 3)'}),
+        ], fluid=True, style={'padding': '0 10px 10px 10px'})
+    ], style={'height': 'calc(100vh - 120px)', 'overflow': 'hidden'})
+], style={'height': '100vh', 'overflow': 'hidden'})
 
 @app.callback(
     [dash.dependencies.Output('temp-trends', 'figure'),
@@ -50,18 +86,37 @@ app.layout = dbc.Container([
 def update_graphs(start_date, end_date):
     filtered_df = df[(df['time'] >= start_date) & (df['time'] <= end_date)]
     
-    temp_fig = px.line(filtered_df, x='time', y=['temperature_2m_mean (°C)', 'temperature_2m_max (°C)', 'temperature_2m_min (°C)'],
-                        labels={'value': 'Temperature (°C)', 'time': 'Date'},
-                        title='Temperature Trends')
+    # Common legend configuration for all graphs
+    legend_config = dict(
+        orientation="h",
+        yanchor="bottom",
+        y=1.02,
+        xanchor="right",
+        x=1,
+        bgcolor="rgba(255,255,255,0.8)"
+    )
     
-    rain_fig = px.bar(filtered_df, x='time', y='rain_sum (mm)',
-                       labels={'rain_sum (mm)': 'Rainfall (mm)', 'time': 'Date'},
-                       title='Daily Rainfall',
-                       barmode='group')
+    temp_fig = px.line(
+        filtered_df, x='time',
+        y=['temperature_2m_mean (°C)', 'temperature_2m_max (°C)', 'temperature_2m_min (°C)'],
+        labels={'value': 'Temp(°C)', 'time': 'Date'}, title=''
+    )
+    temp_fig.update_layout(margin=dict(l=40, r=40, t=30, b=30), legend=legend_config)
     
-    wind_fig = px.line(filtered_df, x='time', y=['wind_speed_10m_max (km/h)', 'wind_gusts_10m_max (km/h)'],
-                        labels={'value': 'Wind Speed (km/h)', 'time': 'Date'},
-                        title='Wind Speed Trends')
+    rain_fig = px.bar(
+        filtered_df, x='time', y='rain_sum (mm)',
+        labels={'rain_sum (mm)': 'Rainfall(mm)', 'time': 'Date'},
+        title='', barmode='group'
+    )
+    rain_fig.update_traces(name='Daily Rainfall', showlegend=True)
+    rain_fig.update_layout(margin=dict(l=40, r=40, t=30, b=30), legend=legend_config)
+    
+    wind_fig = px.line(
+        filtered_df, x='time',
+        y=['wind_speed_10m_max (km/h)', 'wind_gusts_10m_max (km/h)'],
+        labels={'value': 'Speed(km/h)', 'time': 'Date'}, title=''
+    )
+    wind_fig.update_layout(margin=dict(l=40, r=40, t=30, b=30), legend=legend_config)
     
     return temp_fig, rain_fig, wind_fig
 
