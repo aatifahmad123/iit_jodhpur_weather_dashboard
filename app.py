@@ -20,6 +20,7 @@ app.layout = html.Div([
             html.Div(style={
                 'backgroundColor': '#f8f9fa',
                 'padding': '8px',
+                'padding-bottom': '0px',
                 'borderRadius': '10px',
                 'position': 'relative',
                 'zIndex': 1000   # ensures date picker calendar is on top
@@ -49,7 +50,7 @@ app.layout = html.Div([
                     ),
                 ], className='text-center mb-1'),
             ]),
-        ], fluid=True, style={'padding': '10px'})
+        ], fluid=True, style={'padding': '10px', 'padding-bottom': '0px'})
     ], style={'height': '120px', 'overflow': 'visible'}), 
     
     # Dynamic graphs section - takes remaining height
