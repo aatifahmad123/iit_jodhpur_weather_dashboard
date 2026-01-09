@@ -124,4 +124,4 @@ def update_graphs(start_date, end_date):
 server = app.server
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
